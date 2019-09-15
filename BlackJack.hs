@@ -18,7 +18,7 @@ aCard3 = Card Ace Spades
 aHand :: Hand 
 aHand = [aCard1, aCard2]
 
-aHand2 = [Card (Numeric 7) Hearts, Card Ace Spades, Card Ace Diamonds]
+aHand2 = [Card (Numeric 8) Hearts, Card Ace Diamonds]
 
 --Task A1
 --Example showing how a recursive function would process a list
@@ -64,16 +64,32 @@ numberOfAces (card:hand) | rank card == Ace = 1 + numberOfAces(hand)
                          | otherwise = numberOfAces(hand)
 
 --Counts the total value of a players hand
---Feletes 10 points for each ace if value > 21
+--Deletes 10 points for each ace if value > 21
 
 value :: Hand -> Int
 value [] = 0
-value (card:hand) | valueRank(rank(card)) + value(hand) <= 21 
-                   = valueRank(rank(card)) + value(hand)
-                  | otherwise 
+value (card:hand) | valueRank(rank(card)) + value(hand) > 21 
+                   && numberOfAces(card:hand) > 0
                    = valueRank(rank(card)) + value(hand) 
                    - (10 * numberOfAces(card:hand)) 
+                  | otherwise 
+                   = valueRank(rank(card)) + value(hand) 
 
+-- Calculates the total value of a given hand
+
+{-
+-- Fetches the value of a card depending on its rank
+valueCard :: Card -> Int
+valueCard (Card r _)     = valueRank r
+
+value :: Hand -> Int
+value []   = 0
+value hand | ((sum [valueRank(rank(card)) card | card <- hand]) > 21)
+             && ((numberOfAces hand) > 0) 
+             = (sum [valueRank(rank(card)) card | card <- hand]) - 10*(numberOfAces hand)
+           | otherwise = sum [valueRank(rank(card)) card | card <- hand]    -}               
+ 
+    
 --Task A4
 --Functions used for checking various win/lose conditions
 
