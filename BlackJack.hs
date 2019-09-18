@@ -10,7 +10,7 @@ aCard1 :: Card
 aCard1 = Card (Numeric 6) Diamonds
 
 aCard2 :: Card
-aCard2 = Card King Spades
+aCard2 = Card (Numeric 6) Spades
 
 aCard3 :: Card
 aCard3 = Card Ace Spades
@@ -124,10 +124,16 @@ draw deck hand = (drop 1 deck, (take 1 deck) ++ hand)
 
 --B3
 playBank :: Deck -> Hand
-playBank deck | value(hand) < 16 = hand ++ playBank'(deck hand)
-    --call func that gets bankhand and deck
-    --draw cards until value => 16
-    --return hand 
+playBank deck = playBank' (deck, [])
 
-playBank' deck bankHand = (deck', bankHand') 
-    where (deck', bankHand') = draw deck bankHand
+playBank' :: (Deck, Hand) -> Hand
+playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
+             | otherwise = h
+    where d = fst(deckBankH) 
+          h = snd(deckBankH)
+          drawHand = draw d h
+
+--B4 
+--shuffle :: [Double] -> Deck -> Deck
+--shuffle 
+zeroOne = show(getZeroOne)
