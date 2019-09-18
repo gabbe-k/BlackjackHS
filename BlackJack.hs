@@ -104,4 +104,23 @@ winner handG handB | not (gameOver(handG)) &&
                    | not (gameOver(handG))
                      && (gameOver(handB))          = Guest
                    | otherwise                     = Bank
-                     
+
+--B1
+allRanks :: [Rank]
+allRanks  = [Numeric n | n <- [2..10]] ++ [Jack,Queen,King,Ace]
+
+allSuits :: [Suit]
+allSuits = [Hearts, Spades, Diamonds, Clubs]
+
+fullDeck :: Deck
+fullDeck = [Card rank suit | rank <- allRanks , suit <- allSuits]
+
+prop_size_fullDeck = size fullDeck == 52
+
+--B2
+draw :: Deck -> Hand -> (Deck, Hand)
+draw [] _ = error "draw: The deck is empty"
+draw deck hand = (drop 1 deck, (take 1 deck) ++ hand)
+
+--B3
+playBank :: Deck -> Hand
