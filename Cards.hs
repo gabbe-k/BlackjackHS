@@ -35,7 +35,7 @@ data Rank = Numeric Int | Jack | Queen | King | Ace
 
 -- A hand of cards and a deck of cards are both just a lists of Cards:
 type Hand = [Card]
-type Deck = [Card]
+type Deck = [Card] 
 
 -- The size of a hand.
 -- Note that we could have used the function length.
