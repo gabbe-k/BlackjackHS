@@ -124,3 +124,10 @@ draw deck hand = (drop 1 deck, (take 1 deck) ++ hand)
 
 --B3
 playBank :: Deck -> Hand
+playBank deck | value(hand) < 16 = hand ++ playBank'(deck hand)
+    --call func that gets bankhand and deck
+    --draw cards until value => 16
+    --return hand 
+
+playBank' deck bankHand = (deck', bankHand') 
+    where (deck', bankHand') = draw deck bankHand

@@ -98,9 +98,9 @@ gameOver hand = (value hand) > 21
 
 -- Determines the winner of the round depending on the value of the hands,
 -- with both hands being equal in value results in the bank winning
-winner :: Hand -> Hand -> Player
-winner handG handB | (not gameOver(handG)) && (
-                     (value handG) > (value handB)) = Guest
-                   | (not gameOver(handG))
-                     && (gameOver(handB))           = Guest
-                   | otherwise                      = Bank
+winner :: Hand -> Hand -> Player 
+winner handG handB | not (gameOver(handG)) &&  
+                     (value(handG) > value(handB)) = Guest
+                   | not (gameOver(handG))
+                     && (gameOver(handB))          = Guest
+                   | otherwise                     = Bank
