@@ -1,8 +1,10 @@
 module Blackjack where
 
+
 import Cards
 import RunGame
 import Test.QuickCheck hiding (shuffle)
+import Data.List
 
 --Useful definitions
 
@@ -134,6 +136,24 @@ playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
           drawHand = draw d h
 
 --B4 
---shuffle :: [Double] -> Deck -> Deck
---shuffle 
-zeroOne = show(getZeroOne)
+--deleteNth :: Card -> Deck -> Deck
+--deleteNth cardDel (card:deck) 
+--      | card == cardDel = []
+--      | otherwise       = card : deleteNth(deck)
+
+
+--FUNKAR EJ FÖR ATT 2 AV SAMMA KORT KAN VÄLJAS 
+shuffle :: [Double] -> Deck -> Deck
+shuffle randList deck = [ cardAtIndex(rand) | rand <- randList ]
+      where cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
+
+belongsTo :: Card -> Deck -> Bool
+c `belongsTo` []      = False
+c `belongsTo` (c':cs) = c == c' || c `belongsTo` cs
+
+prop_shuffle :: Card -> Deck -> Rand -> Bool
+prop_shuffle card deck (Rand randomlist) =
+    card `belongsTo` deck == card `belongsTo` shuffle randomlist deck
+
+prop_size_shuffle :: Rand -> Deck -> Bool
+prop_size_shuffle (Rand randomlist) deck = undefined
