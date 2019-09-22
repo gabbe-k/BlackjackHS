@@ -136,16 +136,47 @@ playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
           drawHand = draw d h
 
 --B4 
---deleteNth :: Card -> Deck -> Deck
---deleteNth cardDel (card:deck) 
---      | card == cardDel = []
---      | otherwise       = card : deleteNth(deck)
-
+--This works because there is only one instance of each card in the deck
+deleteNth :: Int -> Deck -> Deck
+deleteNth cardIndex deck = delete (deck !! cardIndex) deck
 
 --FUNKAR EJ FÖR ATT 2 AV SAMMA KORT KAN VÄLJAS 
+--shuffle :: [Double] -> Deck -> Deck
+--shuffle randList deck = [ cardAtIndex(i) | i <- randList ]
+--      where cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
+
+--shuffle :: [Double] -> Deck -> Deck
+--shuffle randList deck | length randList == 0 = []
+--                     | otherwise            = [cardAtIndex(randList !! 0)]  
+--                       ++ shuffle randList (deleteNth i deck) 
+--     where 
+--      cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
+--      i = fromIntegral((round ((randList !! 0)*100)) `mod` 52)
+--Rand r <- generate arbitrary
+
+--randPlusDeck :: Deck -> Int -> Deck
+--randPlusDeck deck i = (deck !! i) : (deleteN i deck)
+
+deleteN :: Int -> Deck -> Deck
+deleteN i deck = xa ++ drop 1 xb
+    where 
+    xa = fst(splitAt (i-1) deck) --Beginning of deck 
+    xb = snd(splitAt (i-1) deck) --Rest of deck + element i 
+
+--tmpDeck :: Deck 
+
+--shuffle :: [Double] -> Deck -> Deck
+--shuffle randList deck | 
+--   where 
+--    i = fromIntegral((round ((head randList)*100)) `mod` 52) 
+
 shuffle :: [Double] -> Deck -> Deck
-shuffle randList deck = [ cardAtIndex(rand) | rand <- randList ]
-      where cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
+shuffle randList deck | deck == [] = deck
+                      | (length deck) - i >= 1 = (deck !! i) : shuffle (tail randList) (deleteN i deck)
+                      | otherwise = (head deck) : shuffle (tail randList) (tail deck)
+    where 
+    i = fromIntegral((round ((head randList)*100)) `mod` 52) 
+
 
 belongsTo :: Card -> Deck -> Bool
 c `belongsTo` []      = False
