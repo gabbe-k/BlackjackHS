@@ -1,3 +1,8 @@
+{- Blackjack (Lab2)
+   Authors: Daniel Kvist, Daniel Perlkvist, Gabriel Käll
+   Lab group: 69
+ -}
+
 module Blackjack where
 
 
@@ -108,29 +113,39 @@ winner handG handB | not (gameOver(handG)) &&
                    | otherwise                     = Bank
 
 --B1
+
+--A list of all ranks
 allRanks :: [Rank]
 allRanks  = [Numeric n | n <- [2..10]] ++ [Jack,Queen,King,Ace]
 
+--A list of all suits
 allSuits :: [Suit]
 allSuits = [Hearts, Spades, Diamonds, Clubs]
 
+-- Builds full deck of cards using a list of ranks and a list of suits
 fullDeck :: Deck
 fullDeck = [Card rank suit | rank <- allRanks , suit <- allSuits]
 
 prop_size_fullDeck = size fullDeck == 52
 
 --B2
+
+-- Draws a card from the deck and adds to the hand of whomever drew
 draw :: Deck -> Hand -> (Deck, Hand)
-draw [] _ = error "draw: The deck is empty"
-draw deck hand = (drop 1 deck, (take 1 deck) ++ hand)
+draw deck hand | deck == [] = error "draw: The deck is empty."
+               | otherwise  = ((drop 1 deck), (hand ++ take 1 deck))
 
 --B3
+
+--Plays for the bank
 playBank :: Deck -> Hand
 playBank deck = playBank' (deck, [])
 
+--Does the work for playbank
+--Draws cards until the value of bankhand exceeds 16
 playBank' :: (Deck, Hand) -> Hand
-playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
-             | otherwise = h
+playBank' deckBankH | value(snd(drawHand)) < 17 = playBank'(drawHand)
+                    | otherwise = h
     where d = fst(deckBankH) 
           h = snd(deckBankH)
           drawHand = draw d h
@@ -138,39 +153,35 @@ playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
 --B4 
 
 --Deletes the nth element in a deck
-
 deleteN :: Int -> Deck -> Deck
-deleteN i deck = xa ++ drop 1 xb
+deleteN i deck = xa ++ tail xb
     where 
-    xa = fst(splitAt (i-1) deck) --Beginning of deck 
-    xb = snd(splitAt (i-1) deck) --Rest of deck + element i 
+    xa = fst(splitAt (i) deck) --Beginning of deck 
+    xb = snd(splitAt (i) deck) --element i + Rest of deck 
 
 --Shuffles a deck
-
 shuffle :: [Double] -> Deck -> Deck
 shuffle randList deck | deck == []     = deck
-                      | elem card deck = deck 
                       | otherwise      = (card) : 
                         shuffle (tail randList) (deleteN i deck)
     where 
-    i = fromIntegral((ceiling ((head randList)*100)) `mod` (length deck)) 
+    i = ceiling ((size deck) * (head randList)) - 1 -- Chosen index
     card = deck !! i --The randomly chosen card
 
 --Task B5 
 --Properties that the func shuffle must follow
 
+--Helper function for prop_shuffle
 belongsTo :: Card -> Deck -> Bool
 c `belongsTo` []      = False
 c `belongsTo` (c':cs) = c == c' || c `belongsTo` cs
 
 --Checks if there is exactly one of each card in the shuffled deck
-
 prop_shuffle :: Card -> Deck -> Rand -> Bool
 prop_shuffle card deck (Rand randomlist) =
     card `belongsTo` deck == card `belongsTo` shuffle randomlist deck
 
 --Checks if the length of the deck is the same as before shuffling
-
 prop_size_shuffle :: Rand -> Deck -> Bool
 prop_size_shuffle (Rand randomlist) deck = 
                    length(deck) == length(shuffle randomlist deck)
