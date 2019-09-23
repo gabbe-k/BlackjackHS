@@ -136,26 +136,8 @@ playBank' deckBankH | value(snd(drawHand)) <= 16 = playBank'(drawHand)
           drawHand = draw d h
 
 --B4 
---This works because there is only one instance of each card in the deck
-deleteNth :: Int -> Deck -> Deck
-deleteNth cardIndex deck = delete (deck !! cardIndex) deck
 
---FUNKAR EJ FÖR ATT 2 AV SAMMA KORT KAN VÄLJAS 
---shuffle :: [Double] -> Deck -> Deck
---shuffle randList deck = [ cardAtIndex(i) | i <- randList ]
---      where cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
-
---shuffle :: [Double] -> Deck -> Deck
---shuffle randList deck | length randList == 0 = []
---                     | otherwise            = [cardAtIndex(randList !! 0)]  
---                       ++ shuffle randList (deleteNth i deck) 
---     where 
---      cardAtIndex(x) = deck !! fromIntegral((round (x*100)) `mod` 52)
---      i = fromIntegral((round ((randList !! 0)*100)) `mod` 52)
---Rand r <- generate arbitrary
-
---randPlusDeck :: Deck -> Int -> Deck
---randPlusDeck deck i = (deck !! i) : (deleteN i deck)
+--Deletes the nth element in a deck
 
 deleteN :: Int -> Deck -> Deck
 deleteN i deck = xa ++ drop 1 xb
@@ -163,28 +145,49 @@ deleteN i deck = xa ++ drop 1 xb
     xa = fst(splitAt (i-1) deck) --Beginning of deck 
     xb = snd(splitAt (i-1) deck) --Rest of deck + element i 
 
---tmpDeck :: Deck 
-
---shuffle :: [Double] -> Deck -> Deck
---shuffle randList deck | 
---   where 
---    i = fromIntegral((round ((head randList)*100)) `mod` 52) 
+--Shuffles a deck
 
 shuffle :: [Double] -> Deck -> Deck
-shuffle randList deck | deck == [] = deck
-                      | (length deck) - i >= 1 = (deck !! i) : shuffle (tail randList) (deleteN i deck)
-                      | otherwise = (head deck) : shuffle (tail randList) (tail deck)
+shuffle randList deck | deck == []     = deck
+                      | elem card deck = deck 
+                      | otherwise      = (card) : 
+                        shuffle (tail randList) (deleteN i deck)
     where 
-    i = fromIntegral((round ((head randList)*100)) `mod` 52) 
+    i = fromIntegral((ceiling ((head randList)*100)) `mod` (length deck)) 
+    card = deck !! i --The randomly chosen card
 
+--Task B5 
+--Properties that the func shuffle must follow
 
 belongsTo :: Card -> Deck -> Bool
 c `belongsTo` []      = False
 c `belongsTo` (c':cs) = c == c' || c `belongsTo` cs
 
+--Checks if there is exactly one of each card in the shuffled deck
+
 prop_shuffle :: Card -> Deck -> Rand -> Bool
 prop_shuffle card deck (Rand randomlist) =
     card `belongsTo` deck == card `belongsTo` shuffle randomlist deck
 
+--Checks if the length of the deck is the same as before shuffling
+
 prop_size_shuffle :: Rand -> Deck -> Bool
-prop_size_shuffle (Rand randomlist) deck = undefined
+prop_size_shuffle (Rand randomlist) deck = 
+                   length(deck) == length(shuffle randomlist deck)
+
+--B6
+
+implementation = Interface
+  {  iFullDeck  = fullDeck
+  ,  iValue     = value
+  ,  iDisplay   = display
+  ,  iGameOver  = gameOver
+  ,  iWinner    = winner
+  ,  iDraw      = draw
+  ,  iPlayBank  = playBank
+  ,  iShuffle   = shuffle
+  }
+
+main :: IO ()
+main = runGame implementation
+
